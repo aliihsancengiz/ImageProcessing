@@ -2,10 +2,11 @@
 #include<stdlib.h>
 #include "Matrix.h"
 
-
+// Constructor for matrix it creates two dimensional dynamically allocated matrix by size of (w,h)
 void ConstructorMat(Mat *pSrc,int h,int w)
 {
 	int i,j;
+	// Check for valid dimensions
 	if(w<0 || h <0)
 	{
 		printf("Matrix size cannot be negative \n");
@@ -13,12 +14,14 @@ void ConstructorMat(Mat *pSrc,int h,int w)
 	}
 	pSrc->height=h;
 	pSrc->width=w;
+	// Allocate Memory for first dimension of Matrix
 	pSrc->data=(uint8_t **)malloc(sizeof(uint8_t*)*pSrc->height);
 	if(pSrc->data==NULL)
 	{
 		printf("Failed to Allocate Memory \n");
 		return ;
 	}
+	// Allocate Memory for Second dimension of Matrix
 	for(i=0;i<pSrc->height;i++)
 	{
 		pSrc->data[i]=(uint8_t*)malloc(sizeof(uint8_t)*pSrc->width);
@@ -27,6 +30,8 @@ void ConstructorMat(Mat *pSrc,int h,int w)
 			printf("Failed to Allocate Memory \n");
 		}
 	}
+
+	// Clear matrix
 	for(i=0;i<pSrc->height;i++)
 	{
 		for(j=0;j<pSrc->width;j++)
@@ -35,6 +40,8 @@ void ConstructorMat(Mat *pSrc,int h,int w)
 		}
 	}
 }
+
+// Display Matrix into Standart output
 void displayMat(Mat a)
 {
 	int i,j;
@@ -47,6 +54,8 @@ void displayMat(Mat a)
 		printf("\n");
 	}
 }
+
+// Destruct Dynamically allocated Matrix 
 void DestructorMat(Mat *pSrc)
 {
 	int i;
@@ -54,17 +63,20 @@ void DestructorMat(Mat *pSrc)
 	{
 		return;
 	}
+	//Release second dimension
 	for(i=0;i< pSrc->height;i++)
 	{
 		free(pSrc->data[i]);
 	}
+	// Release first dimension
 	free(pSrc->data);	
 	pSrc->data=NULL;
 }
 
-
+// Add two matrix A,B set result to Dst
 void AddMat(Mat *pSrcA,Mat *pSrcB,Mat *pDst)
 {
+	// Check for valid dimensions
 	if((pSrcA->width == pSrcB->width) && (pSrcA->height == pSrcB->height))
 	{
 		int i,j;
@@ -82,7 +94,7 @@ void AddMat(Mat *pSrcA,Mat *pSrcB,Mat *pDst)
 	}
 }
 
-
+// Fill all Matrix with given value
 void FillMat(Mat *pSrc,int value)
 {
 	int i,j;
@@ -96,8 +108,10 @@ void FillMat(Mat *pSrc,int value)
 	}
 }
 
+// make a dot product on A and B matrix 
 int dotProduct(Mat *pSrcA,Mat *pSrcB)
 {
+	// Check for valid dimensions
 	if((pSrcA->width == pSrcB->width) && (pSrcA->height == pSrcB->height))
 	{
 		int i,j,Sum=0;
@@ -117,7 +131,7 @@ int dotProduct(Mat *pSrcA,Mat *pSrcB)
 	}
 }
 
-
+// Perform Matrix product set result to Dst matrix
 void MatProduct(Mat *pSrcA,Mat *pSrcB,Mat *pDst)
 {
 	if(pSrcA->width != pSrcB->height)

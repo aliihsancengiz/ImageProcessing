@@ -1,24 +1,26 @@
 #include "Image.h"
 
-
-
-
+//Including Stb libraries for reading writing images
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 
 
+//Constructor For Image
 void ctor_Image(char *filename,Image *self)
 {
+    // Load Image 
     uint8_t *rgb_image=stbi_load(filename,&self->width,&self->height,&self->channels,0);
     int i=0,j=0;
-    //printf("Width %d Height %d Nof channels %d \n",self->width,self->height,self->channels);
+    // Check Image is rgb or grayscale
     if(self->channels == 3)
     {
+        // Concstruct Matrixes for r,g,b channel
         ConstructorMat(&self->red,self->height,self->width);
         ConstructorMat(&self->green,self->height,self->width);
         ConstructorMat(&self->blue,self->height,self->width);
+        //Read data into matrises
         for (i = 0; i < self->height; i++)
         {
             for ( j = 0; j < self->width; j++)
@@ -28,11 +30,14 @@ void ctor_Image(char *filename,Image *self)
                 self->blue.data[i][j]=rgb_image[3*(i*self->width+j)+2];
             }
         }
+        // release image
         stbi_image_free(rgb_image);
     }
-    else
+    else //Image is GrayScale
     {
+        // Concstruct Matrixes for gray channel
         ConstructorMat(&self->gray,self->height,self->width);
+        // Read Values into gray matrix
         for(i=0;i<self->height;i++)
         {
             for(j=0;j<self->width;j++)
@@ -40,11 +45,15 @@ void ctor_Image(char *filename,Image *self)
                 self->gray.data[i][j]=rgb_image[i*self->width+j];
             }
         }
+        // Release Image
         stbi_image_free(rgb_image);
     }
 }
+
+//Destructor For Image
 void dtor_Image(Image *self)
 {
+    // Destroy r,g,b channel if image is rgb image,otherwise destroy gray channel matrix
     if(self->channels == 3)
     {
         DestructorMat(&self->red);
@@ -57,9 +66,11 @@ void dtor_Image(Image *self)
     }
     
 }
+//Prepare rgb image to write
 static uint8_t * makergbFlatten(Image *self)
 {
     int size=self->height*self->width*self->channels,i,j,k;
+    // Allocate memory for image data
     uint8_t * rgb=malloc(sizeof(uint8_t)*size);
     if(rgb==NULL)
     {
@@ -75,17 +86,14 @@ static uint8_t * makergbFlatten(Image *self)
                     for(k=0;k<self->channels;k++)
                     if(k%3==0)   // Write r data
                     {
-                        //printf("%d \n",3*(i*self->width+j));
                         rgb[3*(i*self->width+j)]=self->red.data[i][j];
                     }
                     else if(k%3==1)   //write g data
                     {
-                        //printf("%d \n",3*(i*self->width+j)+1);
                         rgb[3*(i*self->width+j)+1]=self->green.data[i][j];
                     }
                     else    //write b data
                     {
-                        //printf("%d \n",3*(i*self->width+j)+2);
                         rgb[3*(i*self->width+j)+2]=self->blue.data[i][j];
                     }
                 }
@@ -96,6 +104,7 @@ static uint8_t * makergbFlatten(Image *self)
 
 }
 
+// Prepare grayscale image to write
 static uint8_t * makegrayscaleflatten(Image *self)
 {
     int size=self->height*self->width,i,j;
@@ -115,6 +124,8 @@ static uint8_t * makegrayscaleflatten(Image *self)
     return flatgray;
 
 }
+
+// Write Image Into file
 void imwrite(char *filename,Image *self)
 {
     if(self->channels==3)
@@ -134,6 +145,8 @@ void imwrite(char *filename,Image *self)
         printf("Uncategorized image format");
     }
 }
+
+//create an empty grayscale image
 void MakeEmptyGrayImage(Image *pDst,int  h,int w)
 {
     pDst->height=h;
@@ -141,6 +154,9 @@ void MakeEmptyGrayImage(Image *pDst,int  h,int w)
     pDst->channels=1;
     ConstructorMat(&pDst->gray,pDst->height,pDst->width);
 }
+
+
+//Convert rgb image to gray scale by multiplying r,g,b channel by [0.2126,0.7152,0.0722] respectively
 void rgb2gray(Image *pSrc,Image *pDst)
 {
     if((pSrc->height==pDst->height) && (pSrc->width == pDst->width))
@@ -162,6 +178,7 @@ void rgb2gray(Image *pSrc,Image *pDst)
     
 }
 
+// Print Image info to standard input
 void ImageInfo(Image *pSrc)
 {
     printf("Height of Image %d\n",pSrc->height);
