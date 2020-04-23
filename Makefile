@@ -1,0 +1,17 @@
+CC=gcc
+
+CFLAG=-g -Wall
+
+EXECNAME=main
+MATRIXLIB=Matrix.h Matrix.c
+IMAGELIB=Image.h Image.c
+HISTLIB=Histogram.h
+DEPENDENCIES=$(EXECNAME).c $(MATRIXLIB) $(IMAGELIB) $(HISTLIB)
+
+
+
+$(EXECNAME):$(DEPENDENCIES)
+	$(CC) -o $(EXECNAME) $(DEPENDENCIES) $(CFLAG) 
+
+run:
+	./$(EXECNAME).exe
